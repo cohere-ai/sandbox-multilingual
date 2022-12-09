@@ -146,7 +146,7 @@ export COHERE_TOKEN=<MY_API_KEY>
 
 By far the easiest option is to run our helper script:
 ```sh
-scripts/ask.sh "My query here"
+scripts/search.sh "My query here in my preferred language searching for news"
 ```
 to query the database. The script takes an optional second argument specifying the number of desired results.
 
@@ -191,12 +191,13 @@ question in natural language, and let's you build a suprisingly effective search
 ### Example queries
 
 Some good-to-try queries that show the search working well on generic, natural language questions are:
-- `What is the tallest mountain in the world?`
-- `Who founded Apple Computers?`
-- `How do I make a sandwich?`
-- `Best Disney movies`
-- `What is the difference between quartz and amehyst?`
-- `How does electricity work?`
+- `How improving children's diets can aid development`
+- `كيف تتقن مهارة جديدة في وقت قياسي؟`
+- `هل يفرض سد النهضة الإثيوبي واقعا جديدا على مصر؟`
+- `WhatsApp: comment l'application gagne de l'argent si son service est gratuit pour la plupart des utilisateurs ?`
+- `米アップル、動画ストリーミングサービスを発表 クレジットカードやゲームサービスも`
+- `グーグル、メインロゴを刷新`
+
 
 
 ### Algorithm Details

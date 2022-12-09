@@ -9,19 +9,19 @@
 # level of this repository.
 
 if [ $# -eq 1 ]
-then 
+then
 	QUERY=$1
 	NUM_RESULTS=5
 elif [ $# -eq 2 ]
-then	
+then
 	QUERY=$1
 	NUM_RESULTS=$2
 else
-	echo "Usage: ./ask.sh QUERY (NUM_RESULTS)"
+	echo "Usage: ./search.sh QUERY (NUM_RESULTS)"
 	echo "Make sure a query containing spaces is surrounded by quotes!"
         exit 0
 fi
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-vim -u "${SCRIPT_DIR}/mappings.vimrc" +cw -M -q <(python utils/query_server.py "$QUERY" --num_results $NUM_RESULTS) 
+vim -u "${SCRIPT_DIR}/mappings.vimrc" +cw -M -q <(python utils/query_server.py "$QUERY" --num_results $NUM_RESULTS)
