@@ -16,6 +16,7 @@ import requests
 
 from tqdm import tqdm
 
+COHERE_BATCH_SIZE = 1024
 COHERE_N_RETRIES = 5
 
 
@@ -37,6 +38,7 @@ class Client:
         self._co = cohere.Client(api_token)
         self._model_name = model_name
         self._embeddings = []
+        self._embed_texts = []
         self._article_titles = []
         self._article_texts = []
         self._article_urls = []
@@ -46,12 +48,21 @@ class Client:
     def embed_articles(self, articles: List[Article]) -> int:
         """Given a list of articles, embed each article using the Cohere client."""
 
+        for article in articles:
+            self._embed_texts.append(f"Title: {article.title}\nText:{article.text}")
+            self._article_titles.append(article.title)
+            self._article_texts.append(article.text)
+            self._article_urls.append(article.url)
+            self._article_summaries.append(article.summary)
+            self._article_languages.append(article.language)
+
         embs = []
-        for article in tqdm(articles):
+        for i in tqdm(range(0, len(self._embed_texts), COHERE_BATCH_SIZE)):
             for _ in range(COHERE_N_RETRIES):
                 try:
-                    _embed_texts = f"Title: {article.title}\nText:{article.text}"
-                    x = self._co.embed([_embed_texts], model=self._model_name, truncate='RIGHT').embeddings
+                    x = self._co.embed(self._embed_texts[i:i + COHERE_BATCH_SIZE],
+                                       model=self._model_name,
+                                       truncate='RIGHT').embeddings
                     embs.extend(x)
                     break
                 except requests.exceptions.ConnectionError:
@@ -64,11 +75,6 @@ class Client:
             else:
                 raise RuntimeError(
                     'Hit maximum number of retries connecting to the Cohere API: is there a problem with your network?')
-            self._article_titles.append(article.title)
-            self._article_texts.append(article.text)
-            self._article_urls.append(article.url)
-            self._article_summaries.append(article.summary)
-            self._article_languages.append(article.language)
 
         self._embeddings = np.array(embs)
         self._article_titles = np.array(self._article_titles)
