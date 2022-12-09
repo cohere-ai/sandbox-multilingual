@@ -55,7 +55,7 @@ text like novels where the information might be spread over several paragraphs- 
 
 # Usage
 
-As an example, this repository builds a simple multilingual semantic search engine over BBC news articles.
+As an example, this repository builds a simple multilingual semantic search engine over BBC news articles covering **45 languages**
 
 ## Setup
 
