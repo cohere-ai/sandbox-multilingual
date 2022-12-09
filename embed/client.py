@@ -14,44 +14,42 @@ import cohere
 import numpy as np
 import requests
 
-COHERE_BATCH_SIZE = 50
+from tqdm import tqdm
+
 COHERE_N_RETRIES = 5
 
 
 @dataclasses.dataclass
-class Block():
-    doc_title: str
+class Article():
+    id: str
+    url: str
+    title: str
+    summary: str
     text: str
-    doc_url: str
-    block_url: str
+    language: str
 
 
 class Client:
     """This class wraps around a Cohere client to facilitate embedding blocks of text."""
 
-    def __init__(self, api_token, model_name: str = "large") -> None:
+    def __init__(self, api_token, model_name: str = "multilingual-22-12") -> None:
 
         self._co = cohere.Client(api_token)
         self._model_name = model_name
         self._embeddings = []
-        self._embed_texts = []
-        self._block_links = []
-        self._doc_links = []
+        self._article_urls = []
+        self._article_summaries = []
+        self._article_languages = []
 
-    def embed_blocks(self, blocks: List[Block], context_window: int) -> int:
-        """Given a list of blocks, embed each block using the Cohere client."""
-        for block in blocks:
-            embed_text = '. '.join([f"Title: {block.doc_title}", f"{block.text}"])
-            self._embed_texts.append(embed_text)
-            self._block_links.append(block.block_url)
-            self._doc_links.append(block.doc_url)
+    def embed_articles(self, articles: List[Article]) -> int:
+        """Given a list of articles, embed each article using the Cohere client."""
 
         embs = []
-        for i in range(0, len(self._embed_texts), COHERE_BATCH_SIZE):
+        for article in tqdm(articles):
             for _ in range(COHERE_N_RETRIES):
                 try:
-                    x = self._co.embed(self._embed_texts[i:i + COHERE_BATCH_SIZE], model=self._model_name,
-                                       truncate='LEFT').embeddings
+                    _embed_texts = f"Title: {article.title}\nText:{article.text}"
+                    x = self._co.embed([_embed_texts], model=self._model_name, truncate='RIGHT').embeddings
                     embs.extend(x)
                     break
                 except requests.exceptions.ConnectionError:
@@ -64,13 +62,23 @@ class Client:
             else:
                 raise RuntimeError(
                     'Hit maximum number of retries connecting to the Cohere API: is there a problem with your network?')
+            self._article_urls.append(article.url)
+            self._article_summaries.append(article.summary)
+            self._article_languages.append(article.language)
 
         self._embeddings = np.array(embs)
-        self._doc_links = np.array(self._doc_links)
-        self._block_links = np.array(self._block_links)
+        self._article_urls = np.array(self._article_urls)
+        self._article_summaries = np.array(self._article_summaries)
+        self._article_languages = np.array(self._article_languages)
 
         return len(self._embeddings)
 
     def save_embeddings(self, output_file):
         """Save embeddings as an npz file."""
-        np.savez(output_file, embeddings=self._embeddings, doc_links=self._doc_links, block_links=self._block_links)
+        np.savez(
+            output_file,
+            embeddings=self._embeddings,
+            article_urls=self._article_urls,
+            article_summaries=self._article_summaries,
+            article_languages=self._article_languages,
+        )

@@ -6,26 +6,17 @@ REGISTRY ?= gcr.io/$(PROJECT)
 IMAGE ?= $(REGISTRY)/$(APP)-$(COMPONENT)
 
 
-download-python-docs:
-	curl https://docs.python.org/3/archives/python-3.11.0-docs-text.zip --output python-docs.zip
-	unzip python-docs.zip -d txt
-	rm -r  txt/python-3.10.7-docs-text/whatsnew  # remote whatsnew because it adds a lot of noise
-	rm python-docs.zip
-
-download-python-docs-small:
-	curl https://docs.python.org/3/archives/python-3.11.0-docs-text.zip --output python-docs.zip
-	unzip python-docs.zip -d txt
-	find txt -d 2 | grep -v tutorial | xargs rm -rd  # remove everything except the tutorial
-	rm python-docs.zip
+download-bbc-news:
+	poetry run python scripts/download_xlsum.py
 
 clean:
-	rm -r txt
+	rm -r data
 	rm embeddings.npz
 
 embeddings:
-	poetry run embed localtxt --root-dir txt --output-file embeddings.npz
+	poetry run embed csv --root-dir data --output-file embeddings.npz
 
-build-data: download-python-docs embeddings
+build-data: download-bbc-news embeddings
 
 build-server:
 	@DOCKER_DEFAULT_PLATFORM='linux/amd64' docker build --build-arg port=8080 -t $(IMAGE):$(VERSION) .

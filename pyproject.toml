@@ -22,6 +22,7 @@ notion-client = "^1.0.0"
 cohere = "^2.2.3"
 numpy = "^1.23.2"
 faiss-cpu = "^1.7.2"
+datasets = "^2.7.1"
 
 [tool.poetry.dev-dependencies]
 yapf = "^0.32.0"

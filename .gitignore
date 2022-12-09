@@ -141,6 +141,7 @@ dmypy.json
 *.jsonl
 *.npz
 txt/
+data/
 
 # Mac stuff
 .DS_Store
