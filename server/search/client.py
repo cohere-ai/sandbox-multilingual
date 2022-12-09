@@ -16,7 +16,7 @@ import numpy as np
 class Client:
     """This class wraps around a Cohere client to facilitate semantic search using query embeddings."""
 
-    def __init__(self, input_embeddings: str, model_name: str = "large") -> None:
+    def __init__(self, input_embeddings: str, model_name: str = "multilingual-22-12") -> None:
         """Initialize the client using embeddings of documents (blocks) provided as input_embeddings."""
         self._co = cohere.Client(os.environ["COHERE_TOKEN"])
         self._model_name = model_name
@@ -44,6 +44,12 @@ class Client:
 
         results = []
         for i, dist in zip(index, distances):
-            result = {"block_url": self._embeddings['block_links'][i], "doc_url": self._embeddings['doc_links'][i]}
+            result = {
+                "article_title": self._embeddings['article_title'][i],
+                "article_text": self._embeddings['article_text'][i],
+                "article_url": self._embeddings['article_url'][i],
+                "article_summary": self._embeddings['article_summary'][i],
+                "article_language": self._embeddings['article_language'][i]
+            }
             results.append(result)
         return results

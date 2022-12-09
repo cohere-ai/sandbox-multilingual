@@ -37,6 +37,8 @@ class Client:
         self._co = cohere.Client(api_token)
         self._model_name = model_name
         self._embeddings = []
+        self._article_titles = []
+        self._article_texts = []
         self._article_urls = []
         self._article_summaries = []
         self._article_languages = []
@@ -62,11 +64,15 @@ class Client:
             else:
                 raise RuntimeError(
                     'Hit maximum number of retries connecting to the Cohere API: is there a problem with your network?')
+            self._article_titles.append(article.title)
+            self._article_texts.append(article.text)
             self._article_urls.append(article.url)
             self._article_summaries.append(article.summary)
             self._article_languages.append(article.language)
 
         self._embeddings = np.array(embs)
+        self._article_titles = np.array(self._article_titles)
+        self._article_texts = np.array(self._article_texts)
         self._article_urls = np.array(self._article_urls)
         self._article_summaries = np.array(self._article_summaries)
         self._article_languages = np.array(self._article_languages)
@@ -78,7 +84,9 @@ class Client:
         np.savez(
             output_file,
             embeddings=self._embeddings,
-            article_urls=self._article_urls,
-            article_summaries=self._article_summaries,
-            article_languages=self._article_languages,
+            article_title=self._article_titles,
+            article_text=self._article_texts,
+            article_url=self._article_urls,
+            article_summary=self._article_summaries,
+            article_language=self._article_languages,
         )

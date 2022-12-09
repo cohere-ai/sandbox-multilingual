@@ -28,4 +28,8 @@ if __name__ == '__main__':
                              },
                              data=json.dumps(query)).json()
     for result in response['results']:
-        print(f"{result['doc_url']}:{result['block_url']}:0:")
+        print(f"Article Title: {result['article_title']}")
+        print(f"Article Text: {result['article_text']}")
+        print(f"Article Summary: {result['article_summary']}")
+        print(f"Article Url: {result['article_url']}")
+        print(f"Article Language: {result['article_language']}")
